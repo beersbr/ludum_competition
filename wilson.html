@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>willlson</title>
+<style>
+  body{
+    background: #330033;
+  }
+  .info{
+    color: white;
+  }
+</style>
+
+<script type="text/javascript" src="javascripts/keyHandler.js"></script>
+<script type="text/javascript" src="javascripts/jquery.js"></script>
+<script>
+
+var game = {
+  // some namespaced vars for dealing with the canvas
+  height: 0,
+  width: 0,
+  screen: null,
+  screen_ctx: null,
+  buffer: null,
+  buffer_ctx: null,
+  fps: 60,
+  key: null,
+
+  fps_tick: 0,
+  ticker: null,
+
+  game_state: "menu",
+  level_number: 2,
+
+  init: function(canvas_id, p){
+    console.log("init");
+    game.screen = document.getElementById(canvas_id);
+    game.screen_ctx = game.screen.getContext('2d');
+
+    game.width = game.screen.width;
+    game.height = game.screen.height;
+
+    game.buffer = document.createElement('canvas');
+    game.buffer.width = game.width;
+    game.buffer.height = game.height;
+    game.buffer_ctx = game.buffer.getContext('2d');
+
+    p = p || {};
+    if(p.key == true){
+      game.key = new keyHandler;
+      console.log("Using keyboard");
+    }
+
+    // prepare game objects
+    game.player = new game.node({ w: 10, h: 10, shape: "circle", image: "./images/ball.png"});
+
+    game.load_level(1);
+
+    game.space = new game.world({gravity: 0.11, friction: 0.95, level: game.level});
+
+    return true;
+  },
+
+  load_level: function(){
+    var current_level = {};
+
+    $.ajax({url:'./json/level'+(game.level_number+=1)+'.json',
+            async: false,
+            success: function(data){
+              current_level = data;
+              if(!(current_level instanceof Object)){
+                current_level = $.parseJSON(data);
+              }
+            },
+            error: function(err){
+              console.log("there are no more levels in this set.");
+              game.game_state = "finished";
+            }
+    });
+
+    game.level = null;
+    game.level = new game.levels(current_level);
+    game.player.x = current_level["start"].x;
+    game.player.y = current_level["start"].y;
+    game.player.ax = 0;
+    game.player.ay = 0;
+  },
+
+  reset_level: function(){
+    game.player.x = game.level["start"].x;
+    game.player.y = game.level["start"].y;
+    game.player.ax = 0;
+    game.player.ay = 0;
+  },
+
+  node: function(p){
+    // member variables
+    this.x = p.x;
+    this.y = p.y;
+    this.shape = p.shape;
+    this.width = p.w;
+    this.height = p.h;
+
+    // acceleration in each direction
+    this.ax = 0;
+    this.ay = 0;
+
+    this.image_path = p.image;
+    this.image = new Image();
+    this.image.src = this.image_path;
+
+    this.image_overlay = new Image();
+    this.image_overlay.src = './images/ball_shadow.png';
+
+    this.rot = 0;
+    this.rot_friction = .87;
+
+    this.update = function(world){
+      friction = world.friction;
+      gravity = world.gravity
+
+      for(i in game.level["walls"]){
+        var o = game.level.walls[i];
+        if(this.collision(o)){
+          // collision happens here!
+
+          switch(o.type){
+            case "wall":
+              game.reset_level();
+              break;
+
+            case "slow":
+              friction = 0.81;
+              gravity = 2;
+              break;
+
+            case "booster":
+              switch(o.direction){
+                case "u":
+                  this.ay -= o.power;
+                  break;
+                case "d":
+                  this.ay += o.power;
+                  break;
+                case "l":
+                  this.ax -= o.power;
+                  break;
+                case "r":
+                  this.ax += o.power;
+                  break;
+              }
+              
+              break;
+
+            case "reverse_gravity":
+              gravity = gravity*-1;
+              break;
+
+            case "level_finish":
+              game.load_level();
+              break;
+          }
+
+        }
+      }
+
+      this.x += (this.ax *= friction);
+      this.y += this.ay += gravity;;
+      // this.y += (this.ay *= friction);
+
+      this.rot += this.ax*4;
+
+    }
+
+    // returns true if this collides with node, a shape must have an x, y, width and height. In this case there will only be rects
+    this.collision = function(shape){
+
+      // we are assuming that we are a cirlce here
+      //if(this.shape == "circle"){}
+
+      var dist_x = Math.abs(this.x - (shape.x + (shape.w/2)));
+      var dist_y = Math.abs(this.y - (shape.y + (shape.h/2)));
+
+      if(dist_x > ((shape.w/2) + this.width)){ return false; }
+      if(dist_y > ((shape.h/2) + this.width)){ return false; }
+
+      if(dist_x <= (shape.w/2)){ return true; }
+      if(dist_y <= (shape.h/2)){ return true; }
+
+      corner = Math.pow((dist_x - shape.w/2), 2) + Math.pow((dist_y - shape.h/2), 2);
+      return (corner <= Math.pow(this.width, 2));
+
+    }
+
+    // draws to the global buffer which is defined in game
+    this.draw = function(){
+      game.buffer_ctx.save(); // save the canvas state
+      game.buffer_ctx.translate(this.x, this.y);                                  // move the origin x, y of the canvas to (this.x, this.y)
+      game.buffer_ctx.rotate(this.rot * Math.PI/180);                             // rotate the canvas
+      game.buffer_ctx.drawImage(this.image, 0-this.width, 0-this.width, 20, 20);  // draw the image at 0, 0 because we are at the origin
+      game.buffer_ctx.restore();                                                  // pop the canvas state restoring the origin to the top left corner
+
+      game.buffer_ctx.drawImage(this.image_overlay, this.x-this.width, this.y-this.width, 20, 20); // draw the shadow overlay onto the ball
+      return true;
+    }
+  },
+
+  levels: function(level_json){
+    this.walls = level_json.walls;
+    this.start = level_json.start;
+    // TODO: Get these working before we draw them.
+    // this.objects = level_json.objects;
+
+    this.draw = function(){
+      game.buffer_ctx.save();
+
+      for(i in this.walls){
+        var o = this.walls[i];
+
+        switch(o.type){
+          case "wall":
+            game.buffer_ctx.fillStyle = "rgb(255,255,255)";  // color the walls white
+            break;
+          case "slow":
+            game.buffer_ctx.fillStyle = "rgb(155,155,255)";  // color the slow block blue-ish
+            break;
+          case "booster":
+            game.buffer_ctx.fillStyle = "rgb(255,155,155)";  // color the boosters red-ish
+            break;
+          case "reverse_gravity":
+            game.buffer_ctx.fillStyle = "rgb(155,255,155)";  // color the reverse gravity green-ish
+            break;
+          case "level_finish":
+            game.buffer_ctx.fillStyle = "rgb(155,0,255)";  // color the finish spot purple
+            break;
+        }
+        game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+      }
+
+      game.buffer_ctx.restore();
+    }
+  },
+
+  world: function(p){
+    this.gravity = p.gravity;
+    this.friction = p.friction;
+  },
+
+  draw_menu: function(){
+    
+  },
+
+
+  // pause menu / lose menu / starting menu
+  update_menu: function(){
+    if(game.key.keyIs('w')){
+      
+    }
+    if(game.key.keyIs('s')){
+      
+    }
+    if(game.key.keyIs('e')){
+      game.game_state = "playing";
+    }
+  },
+
+  // This is the main game loop
+  main: function(){
+
+    if(game.game_state == "menu"){
+      game.update_menu();
+      game.draw_menu();
+    }
+
+    if(game.key.keyPressed('q')){
+      if(game.game_state == "playing"){
+        game.game_state = "paused";
+        console.log("paused");
+      }
+      else if(game.game_state == "paused"){
+        game.game_state = "playing";
+        console.log("playing");
+      }
+    }
+
+
+    if(game.game_state == "playing" || game.games_state == "paused"){
+
+      // player input
+      if(game.key.keyIs('w')){
+        game.player.ay -= 0.3;
+      }
+      if(game.key.keyIs('a')){
+        game.player.ax -= 0.3;
+      }
+      if(game.key.keyIs('s')){
+        game.player.ay += 0.3;
+      }
+      if(game.key.keyIs('d')){
+        game.player.ax += 0.3;
+      }
+      if(game.key.keyPressed('g')){
+        game.reset_level();
+      }
+
+      game.player.update(game.space);
+
+      game.level.draw();
+      game.player.draw();
+
+      game.flip();
+    }
+  },
+
+  flip: function(){
+    game.screen_ctx.drawImage(game.buffer, 0, 0);
+    // game.buffer_ctx.clearRect(0, 0);
+    game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
+    game.buffer_ctx.fillRect(0, 0, game.width, game.height);
+  }
+
+}
+
+window.onload = function(){
+  game.init('canvas', {key: true});
+  game.ticker = setInterval(game.main, 1000/game.fps);
+
+}
+
+</script>
+</head>
+<body>
+  <div class="info">
+    Use W, A, S, D to move. Touching the white will kill you :/ I still have to work out some of the physics to be a bit more smooth. Enjoy.
+  </div>
+  <div>
+    <canvas id="canvas" width='640' height='480'></canvas>
+  </div>
+</body>
+</html>

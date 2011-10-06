@@ -1,0 +1,11 @@
+All of the files are here. I have been using MAMP for testing due to the ajax pulling. I got wierd results when I just used the browser and the filesystem.
+
+I have marked the drawing code where the ball is and I have marked where the drawing code for the blocks are. But in case the code
+is hard to plug through here are the line numbers:
+
+
++ drawing the wall in the level object:
+  line number: 214
+
++ where the player gets drawn in the node object:
+  line number: 196
