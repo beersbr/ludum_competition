@@ -163,6 +163,27 @@ var game = {
               gravity = gravity*-1;
               break;
 
+            case "bounce":
+              switch(o.direction){
+                case "l":
+                  this.ax += 3.3;
+                  this.ax *= -1;
+                  break;
+                case "r":
+                  this.ax -= 3.3;
+                  this.ax *= -1;
+                  break;
+                case "u":
+                  this.ay -= 3.3;
+                  this.ay *= -1;
+                  break;
+                case "d":
+                  this.ay += 3.3;
+                  this.ay *= -1;
+                  break;
+              }
+              break;
+
             case "moving_wall":
               game.reset_level();
               break;
@@ -276,6 +297,10 @@ var game = {
             break;
           case "reverse_gravity":
             game.buffer_ctx.fillStyle = "rgb(155,255,155)";  // color the reverse gravity green-ish
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+            break;
+          case "bounce":
+            game.buffer_ctx.fillStyle = "rgb(50, 50, 150)";
             game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "level_finish":
