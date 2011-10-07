@@ -8,6 +8,14 @@
   }
   .info{
     color: white;
+    float: left;
+    display:block;
+    padding: 10px;
+    width: 300px;
+  }
+  .canvas_container{
+    float:left;
+    display:block;
   }
 </style>
 
@@ -53,9 +61,7 @@ var game = {
 
     // prepare game objects
     game.player = new game.node({ w: 10, h: 10, shape: "circle", image: "./images/ball.png"});
-
-    game.load_level(1);
-
+    game.load_level();
     game.space = new game.world({gravity: 0.11, friction: 0.95, level: game.level});
 
     return true;
@@ -130,8 +136,9 @@ var game = {
               break;
 
             case "slow":
-              friction = 0.81;
-              gravity = 2;
+              // TODO: friction needs to be applied to both x and y directinos
+              friction = 0.5;
+              gravity = 0.02;
               break;
 
             case "booster":
@@ -156,6 +163,10 @@ var game = {
               gravity = gravity*-1;
               break;
 
+            case "moving_wall":
+              game.reset_level();
+              break;
+
             case "level_finish":
               game.load_level();
               break;
@@ -165,10 +176,8 @@ var game = {
       }
 
       this.x += (this.ax *= friction);
-      this.y += this.ay += gravity;;
-      // this.y += (this.ay *= friction);
-
-      this.rot += this.ax*4;
+      this.y += this.ay += gravity;
+      this.rot += this.ax*5;
 
     }
 
@@ -189,7 +198,6 @@ var game = {
 
       corner = Math.pow((dist_x - shape.w/2), 2) + Math.pow((dist_y - shape.h/2), 2);
       return (corner <= Math.pow(this.width, 2));
-
     }
 
     // draws to the global buffer which is defined in game
@@ -206,7 +214,40 @@ var game = {
   },
 
   levels: function(level_json){
+    this.raw = level_json;
     this.walls = level_json.walls;
+
+    // add the special data for certian types.
+    for(i in this.walls){
+
+      // add stuff for the moving wall
+      if(this.walls[i].type == "moving_wall"){
+        this.walls[i].static_width = this.walls[i].w;
+        this.walls[i].static_x = this.walls[i].x;
+        this.walls[i].static_height = this.walls[i].h;
+        this.walls[i].static_y = this.walls[i].y;
+        this.walls[i].switch = -1;
+
+        // set the offset so the walls don't appear so uniform.
+        switch(this.walls[i].direction){
+          case "l":
+            this.walls[i].x += this.walls[i].offset;
+            this.walls[i].w -= this.walls[i].offset;
+            break;
+          case "r":
+            this.walls[i].w -= this.walls[i].offset;
+            break;
+          case "u":
+            this.walls[i].y += this.walls[i].offset;
+            this.walls[i].h -= this.walls[i].offset;
+            break;
+          case "d":
+            this.walls[i].h -= this.walls[i].offset;
+            break;
+        }
+      }
+    }
+
     this.start = level_json.start;
     // TODO: Get these working before we draw them.
     // this.objects = level_json.objects;
@@ -214,27 +255,77 @@ var game = {
     this.draw = function(){
       game.buffer_ctx.save();
 
+      game.buffer_ctx.fillStyle = "rgb(50, 50, 50)";
+      game.buffer_ctx.fillRect(this.start.x-10, this.start.y-10, 20, 20);
+
       for(i in this.walls){
         var o = this.walls[i];
 
         switch(o.type){
           case "wall":
             game.buffer_ctx.fillStyle = "rgb(255,255,255)";  // color the walls white
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "slow":
             game.buffer_ctx.fillStyle = "rgb(155,155,255)";  // color the slow block blue-ish
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "booster":
             game.buffer_ctx.fillStyle = "rgb(255,155,155)";  // color the boosters red-ish
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "reverse_gravity":
             game.buffer_ctx.fillStyle = "rgb(155,255,155)";  // color the reverse gravity green-ish
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "level_finish":
-            game.buffer_ctx.fillStyle = "rgb(155,0,255)";  // color the finish spot purple
+            game.buffer_ctx.fillStyle = "rgb(155,0,255)";    // color the finish spot purple
+            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+            break;
+          case "moving_wall":
+            game.buffer_ctx.fillStyle = "rgb(255, 0, 255)";
+            
+            // drawing instructions
+            switch(o.direction){
+              case "l":
+                if(o.x > o.x+o.w){
+                  o.switch *= -1;
+                }else if(o.x < o.static_x){
+                  o.switch *= -1;
+                }
+                o.x += o.switch*o.speed;
+                o.w += -o.switch*o.speed;
+                break;
+              case "r":
+                if(o.x+o.w < o.x){
+                  o.switch *= -1;
+                }else if(o.w > o.static_width){
+                  o.switch *= -1;
+                }
+                o.w += -o.switch*o.speed;
+                break;
+              case "u":
+                if(o.y > o.y+o.h){
+                  o.switch *= -1;
+                }else if(o.y < o.static_y){
+                  o.switch *= -1;
+                }
+                o.y += o.switch*o.speed;
+                o.h += -o.switch*o.speed;
+                break;
+              case "d":
+                if(o.y+o.h < o.y){
+                  o.switch *= -1;
+                }else if(o.h > o.static_height){
+                  o.switch *= -1;
+                }
+                o.h += -o.switch*o.speed;
+                break;
+            }
+            game.buffer_ctx.fillRect(o.x, o.y, o.w, o.h);
             break;
         }
-        game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+        
       }
 
       game.buffer_ctx.restore();
@@ -287,14 +378,15 @@ var game = {
     if(game.game_state == "playing" || game.games_state == "paused"){
 
       // player input
+      var thrust = thrust || 0.75;
       if(game.key.keyIs('w')){
-        game.player.ay -= 0.3;
+        game.player.ay -= 0.3 * thrust;
       }
       if(game.key.keyIs('a')){
         game.player.ax -= 0.3;
       }
       if(game.key.keyIs('s')){
-        game.player.ay += 0.3;
+        game.player.ay += 0.3 * thrust;
       }
       if(game.key.keyIs('d')){
         game.player.ax += 0.3;
@@ -331,9 +423,15 @@ window.onload = function(){
 </head>
 <body>
   <div class="info">
-    Use W, A, S, D to move. Touching the white will kill you :/ I still have to work out some of the physics to be a bit more smooth. Enjoy.
+    Instructions: <br />
+    Move with W, A, S, D <br />
+    Press E to start <br />
+    press Q to pause <br />
+    press G to restart <br />
+    <br />
+    Your goal is to get to the purple door. Do that by not touching any of the walls which are WHITE. The PINK walls move and, though they are not white, they will also kill you. Good luck!
   </div>
-  <div>
+  <div class'canvas_container'>
     <canvas id="canvas" width='640' height='480'></canvas>
   </div>
 </body>

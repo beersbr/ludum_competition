@@ -9,6 +9,9 @@
     {"x": 320, "y": 80, "w": 10, "h": 330, "type": "wall"},
     {"x": 90, "y": 410, "w": 540, "h": 60, "type": "reverse_gravity"},
     {"x": 10, "y": 10, "w": 150, "h": 70, "type": "booster", "direction": "d", "power": 0.3 },
+    {"x": 170, "y": 100, "w": 150, "h": 50, "type": "moving_wall", "direction": "l", "speed": 0.6, "offset": 30},
+    {"x": 170, "y": 170, "w": 150, "h": 50, "type": "moving_wall", "direction": "r", "speed": 1, "offset": 30},
+    {"x": 400, "y": 10, "w": 50, "h": 150, "type": "moving_wall", "direction": "d", "speed": 1, "offset": 30},
     {"x": 620, "y": 400, "w": 40, "h": 40, "type": "level_finish"}
   ],
   "start": {"x": 50, "y": 420 }
