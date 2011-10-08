@@ -1,7 +1,7 @@
 {
   "walls": [
     {"x": 0, "y": 0, "w": 10, "h": 480, "type": "wall"},
-    {"x": 10, "y": 0, "w": 10, "h": 480, "type": "bounce", "direction": "r"},
+    {"x": 10, "y": 0, "w": 10, "h": 480, "type": "bounce", "direction": "l"},
     {"x": 630, "y": 0, "w": 10, "h": 480, "type": "wall"},
     {"x": 0, "y": 0, "w": 640, "h": 10, "type": "wall"},
     {"x": 0, "y": 470, "w": 640, "h": 10, "type": "wall"},

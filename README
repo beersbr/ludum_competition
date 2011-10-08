@@ -9,3 +9,71 @@ is hard to plug through here are the line numbers:
 
 + where the player gets drawn in the node object:
   line number: 196
+
+
+TODO: 
+  + Make the collision pre-emptive so we don't have any phasing through blocks
+
+Documentation: 
+
+Block types: 
++ Wall:
+  - This is just a wall and will kill the player upon collision.
+
+  type: "wall"
+  x: x coordinate
+  y: y coordinate
+  w: width of block
+  h: height of block
+  - Example:
+      {"x": 0, "y": 0, "w": 10, "h": 480, "type": "wall"}
+
++ Bounce:
+  - This will bounce the ball in the direction specified
+
+  type: "bounce"
+  x: x coordinate
+  y: y coordinate
+  w: width of block
+  h: height of block
+  direction: [lrdu] for the direction the ball will bounce
+  - Example:
+    {"x": 10, "y": 0, "w": 10, "h": 480, "type": "bounce", "direction": "l"}
+
++ Reverse Gravity:
+  - This takes the current gravity and reverses it. Very similar to booster but without any extra parameters.
+
+  type: "reverse_gravity"
+  x: x coordinate
+  y: y coordinate
+  w: width of block
+  h: height of block
+  - Example: 
+    {"x": 90, "y": 410, "w": 540, "h": 60, "type": "reverse_gravity"}
+
++ Moving Wall:
+  - This is a wall that opens and closes over time. They start as a full block, in our case closed.
+
+  type: "moving_wall"
+  x: x coordinate
+  y: y coordinate
+  w: width of block
+  h: height of block
+  direction: [lrdu] for the direction the wall will open and close in.
+  speed: [n > 0.0] for the speed the wall will move at.
+  offset: [n > 0] for the offset the wall will start at in pixels
+  - Example:
+    {"x": 170, "y": 100, "w": 150, "h": 50, "type": "moving_wall", "direction": "l", "speed": 0.6, "offset": 30}
+
++ Booster:
+  - This is a booster that will boost the player in a given direction.
+
+  type: "booster"
+  x: x coordinate
+  y: y coordinate
+  w: width of block
+  h: height of block
+  direction: [lrdu] for the direction the booster boosts.
+  power: [n > 0.0] for how much boost this block adds to the players velocity
+  - Example:
+    {"x": 10, "y": 10, "w": 150, "h": 70, "type": "booster", "direction": "d", "power": 0.3 }

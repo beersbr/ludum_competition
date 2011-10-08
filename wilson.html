@@ -166,19 +166,19 @@ var game = {
             case "bounce":
               switch(o.direction){
                 case "l":
-                  this.ax += 3.3;
-                  this.ax *= -1;
-                  break;
-                case "r":
                   this.ax -= 3.3;
                   this.ax *= -1;
                   break;
+                case "r":
+                  this.ax += 3.3;
+                  this.ax *= -1;
+                  break;
                 case "u":
-                  this.ay -= 3.3;
+                  this.ay += 3.3;
                   this.ay *= -1;
                   break;
                 case "d":
-                  this.ay += 3.3;
+                  this.ay -= 3.3;
                   this.ay *= -1;
                   break;
               }
@@ -277,7 +277,7 @@ var game = {
       game.buffer_ctx.save();
 
       game.buffer_ctx.fillStyle = "rgb(50, 50, 50)";
-      game.buffer_ctx.fillRect(this.start.x-10, this.start.y-10, 20, 20);
+      game.buffer_ctx.fillRect(this.start.x-5, this.start.y-5, 10, 10);
 
       for(i in this.walls){
         var o = this.walls[i];
