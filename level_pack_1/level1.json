@@ -1,0 +1,17 @@
+{
+	"walls":[
+		{"x": 0,   "y": 0,   "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 470, "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 630, "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 590, "y": 430, "w": 10,  "h": 10,  "type": "level_finish"},
+		{"x": 20,  "y": 30,  "type": "text", "text": "Start"},
+		{"x": 580, "y": 420, "type": "text", "text": "Finish"},
+		{"x": 410, "y": 40, "type": "text", "text": "The game is simple, to go from"},
+		{"x": 412, "y": 60, "type": "text", "text": "the Start point to the Finish point."},
+		{"x": 60, "y": 200, "type": "text", "text": "You must get there without"},
+		{"x": 60, "y": 220, "type": "text", "text": "the walls. They look like this --> "},
+		{"x": 265, "y": 207,   "w": 20,  "h": 20, "type": "wall"}
+	],
+	"start": {"x": 40, "y": 40}
+}

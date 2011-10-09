@@ -8,9 +8,7 @@
     {"x": 60, "y": 110, "w": 500, "h": 10, "type": "bounce", "direction": "u"},
     {"x": 10, "y": 10, "w": 200, "h": 50, "type": "booster", "power": 0.9, "direction": "d"},
     {"x": 60, "y": 220, "w": 500, "h": 10, "type": "wall"},
-    {"x": 60, "y": 120, "w": 10, "h": 100, "type": "wall"},
-    {"x": 320, "y": 200, "w": 10, "h": 10, "type": "teleporter", "id": 1, "to_id": 2},
-    {"x": 320, "y": 400, "w": 10, "h": 10, "type": "teleporter", "id": 2, "to_id": 1}
+    {"x": 60, "y": 120, "w": 10, "h": 100, "type": "wall"}
 
   ],
   "start": {"x": 320, "y": 50 }

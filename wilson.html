@@ -46,7 +46,7 @@ var game = {
 
   // game_state: "menu",
   game_state: "playing",
-  level_number: 2,
+  level_number: 0,
 
   init: function(canvas_id, p){
     console.log("init");
@@ -85,7 +85,7 @@ var game = {
   load_level: function(){
     var current_level = {};
 
-    $.ajax({url:'./json/level'+(game.level_number+=1)+'.json',
+    $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
             async: false,
             success: function(data){
               current_level = data;
@@ -101,15 +101,15 @@ var game = {
 
     game.level = null;
     game.level = new game.levels(current_level);
-    game.player.x = current_level["start"].x;
-    game.player.y = current_level["start"].y;
+    game.player.x = current_level.start.x;
+    game.player.y = current_level.start.y;
     game.player.ax = 0;
     game.player.ay = 0;
   },
 
   reset_level: function(){
-    game.player.x = game.level["start"].x;
-    game.player.y = game.level["start"].y;
+    game.player.x = game.level.start.x;
+    game.player.y = game.level.start.y;
     game.player.ax = 0;
     game.player.ay = 0;
   },
@@ -140,7 +140,7 @@ var game = {
       friction = world.friction;
       gravity = world.gravity
 
-      for(i in game.level["walls"]){
+      for(i in game.level.walls){
         var o = game.level.walls[i];
         if(this.collision(o)){
           // collision happens here!
@@ -204,6 +204,7 @@ var game = {
               break;
 
             case "level_finish":
+              console.log("moving to next level");
               game.load_level();
               break;
 
@@ -226,7 +227,7 @@ var game = {
       this.y += this.ay;
       this.rot += this.ax*5;
 
-      debug.html((this.x).toFixed(2)+", "+(this.y).toFixed(2)+"<br />"+(this.ax).toFixed(2)+", "+(this.ay).toFixed(2)+"<br />"+max.toFixed(2)+", "+min.toFixed(2));
+      // debug.html((this.x).toFixed(2)+", "+(this.y).toFixed(2)+"<br />"+(this.ax).toFixed(2)+", "+(this.ay).toFixed(2)+"<br />"+max.toFixed(2)+", "+min.toFixed(2));
 
     }
 
@@ -402,6 +403,13 @@ var game = {
             game.buffer_ctx.fillStyle = "rgb(100, 0, 100)";
             game.buffer_ctx.fillRect(o.x, o.y, 10, 10);
             game.buffer_ctx.fillRect(o.to.x, o.to.y, 10, 10);
+            break;
+
+          case "text":
+            // we always want the text to be on top of everything else
+            game.buffer_ctx.font = "normal 14px sans-serif";
+            game.buffer_ctx.fillStyle = "rgb(255, 255, 255)";
+            game.buffer_ctx.fillText(o.text, o.x, o.y);
             break;
         }
         

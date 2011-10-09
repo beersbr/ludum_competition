@@ -22,6 +22,8 @@ TODO:
   + Make all the static walls in the background an image so we only have to draw them once. The game will load, and
     take all of the wall drawn on the screen and save that image and use it over and over so that draw calls
     don't stack up.
+  + When the player has completed the last level the game should move to another screen gracefully.
+  + Move the "player_finish" block out of the walls section and into its own property for the level. (This would take away the ability to make finish points arbutrary sizes).
 
 Documentation: 
 
@@ -89,6 +91,8 @@ Block types:
 
 + Teleporters:
   - This type of block will teleport the player to a given position on collision.
+
+  type: "teleporter"
   x: x coordinate
   y: y coordinate
   w: width of block (currently staticly drawn )
@@ -96,3 +100,13 @@ Block types:
   to: the position of the destination as a hash.
   - Example:
     {"x": 320, "y": 400, "w": 10, "h": 10, "type": "teleporter", "to": {"x": 100, "y": 200}}
+
++ Text:
+  - Draws the specified text on the screen at the location set.
+
+  type: "text"
+  x: x coordinate
+  y: y coordinate
+  text: the text you want to draw to the screen
+  - Example: 
+    {"x": 580, "y": 420, "type": "text", "text": "this is some text!"}
