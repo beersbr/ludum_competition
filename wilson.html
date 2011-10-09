@@ -46,7 +46,7 @@ var game = {
 
   // game_state: "menu",
   game_state: "playing",
-  level_number: 4,
+  level_number: 2,
 
   init: function(canvas_id, p){
     console.log("init");
@@ -61,6 +61,8 @@ var game = {
     game.buffer.height = game.height;
     game.buffer_ctx = game.buffer.getContext('2d');
 
+    game.resources = new game.load_resources();
+
     p = p || {};
     if(p.key == true){
       game.key = new keyHandler;
@@ -73,6 +75,11 @@ var game = {
     game.space = new game.world({gravity: 0.11, friction: 0.95, level: game.level});
 
     return true;
+  },
+
+  load_resources: function(){
+    this.wall_image = new Image();
+    this.wall_image.src = "./images/stone.png";
   },
 
   load_level: function(){
@@ -315,8 +322,18 @@ var game = {
 
         switch(o.type){
           case "wall":
-            game.buffer_ctx.fillStyle = "rgb(255,255,255)";  // color the walls white
-            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
+            var wi = o.w/10;
+            var hi = o.h/10;
+
+            // draw the stone.png on the walls
+            for(var i = 0; i < wi; i++){
+              for(var j = 0; j < hi; j++){
+                game.buffer_ctx.drawImage(game.resources.wall_image, o.x+(i*10), o.y+(j*10), 10, 10);
+              }
+            }
+
+            // game.buffer_ctx.fillStyle = "rgb(255,255,255)";  // color the walls white
+            // game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "slow":
             game.buffer_ctx.fillStyle = "rgb(155,155,255)";  // color the slow block blue-ish

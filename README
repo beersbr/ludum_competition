@@ -18,6 +18,10 @@ TODO:
   + Change the width and the height of the teleporters so they are not static and can be changed so that they 
     are drawn to the screen properly.
   + Fix the teleportation so the player is drawn to the center of the destination.
+  + Add insurrance to the fact that we are using 10's as a base. Every walls width and height mod 10 must be 0;
+  + Make all the static walls in the background an image so we only have to draw them once. The game will load, and
+    take all of the wall drawn on the screen and save that image and use it over and over so that draw calls
+    don't stack up.
 
 Documentation: 
 
