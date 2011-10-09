@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Wilson v1.1</title>
+	<script type="text/javascript" src="javascripts/keyHandler.js"></script>
+	<script type="text/javascript" src="javascripts/jquery.js"></script>
+<script type="text/javascript">
+var Game = {
+  height: 0,
+  width: 0,
+  screen: null,
+  screen_ctx: null,
+  buffer: null,
+  buffer_ctx: null,
+  fps: 60,
+  key: null,
+
+  fps_tick: 0,
+  ticker: null,
+
+  state: "playing",
+  level_number: 0,
+
+  init: function(canvas_id, p){
+	  game.screen = document.getElementById(canvas_id);
+	  game.screen_ctx = game.screen.getContext('2d');
+
+	  game.width = game.screen.width;
+	  game.height = game.screen.height;
+
+	  game.buffer = document.createElement('canvas');
+	  game.buffer.width = game.width;
+	  game.buffer.height = game.height;
+	  game.buffer_ctx = game.buffer.getContext('2d');
+
+	  game.resources = new game.load_resources();
+
+	  p = p || {};
+	  if(p.key == true){
+	    game.key = new keyHandler;
+	    console.log("Using keyboard");
+	  }
+
+	  // prepare game objects
+	  game.player = new game.node({ w: 10, h: 10, shape: "circle", image: "./images/ball.png"});
+	  game.load_level();
+	  game.space = new game.world({gravity: 0.11, friction: 0.95, level: game.level});
+
+	  return true;
+  },
+}
+</script>
+</head>
+<body>
+
+</body>
+</html>

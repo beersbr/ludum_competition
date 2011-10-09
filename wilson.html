@@ -80,6 +80,19 @@ var game = {
   load_resources: function(){
     this.wall_image = new Image();
     this.wall_image.src = "./images/stone.png";
+
+    this.booster_left = new Image();
+    this.booster_left.src = "./images/booster_left.png";
+
+    this.booster_right = new Image();
+    this.booster_right.src = "./images/booster_right.png";
+
+    this.booster_up = new Image();
+    this.booster_up.src = "./images/booster_up.png";
+
+    this.booster_down = new Image();
+    this.booster_down.src = "./images/booster_down.png";
+
   },
 
   load_level: function(){
@@ -268,6 +281,55 @@ var game = {
   levels: function(level_json){
     this.raw = level_json;
     this.walls = level_json.walls;
+    this.background = new Image();
+
+    // draw the static items to the background.
+    for(i in this.walls){
+      var o = this.walls[i];
+
+      switch(this.walls[i].type){
+        case "wall":
+            var wi = o.w/10;
+            var hi = o.h/10;
+
+            // draw the stone.png on the walls
+            for(var i = 0; i < wi; i++){
+              for(var j = 0; j < hi; j++){
+                game.buffer_ctx.drawImage(game.resources.wall_image, o.x+(i*10), o.y+(j*10), 10, 10);
+              }
+            }
+          break;
+
+        case "booster":
+            var wi = o.w/10;
+            var hi = o.h/10;
+            var image = null;
+
+            switch(o.direction){
+              case "u":
+                image = game.resources.booster_up;
+                break;
+              case "l":
+                image = game.resources.booster_left;
+                break;
+              case "d":
+                image = game.resources.booster_down;
+                break;
+              case "r":
+                image = game.resources.booster_right;
+                break
+            }
+
+            // draw the stone.png on the walls
+            for(var i = 0; i < wi; i++){
+              for(var j = 0; j < hi; j++){
+                game.buffer_ctx.drawImage(image, o.x+(i*10), o.y+(j*10), 10, 10);
+              }
+            }
+          break;
+      }
+    }
+    this.background.src = game.buffer.toDataURL();
 
     // add the special data for certian types.
     for(var i in this.walls){
@@ -299,20 +361,14 @@ var game = {
               break;
           }
           break;
-
-        case "teleporter":
-          // have to find the coords of the other teleporter.
-
-
-          break;
+        break;
       }
     }
 
     this.start = level_json.start;
-    // TODO: Get these working before we draw them.
-    // this.objects = level_json.objects;
 
     this.draw = function(){
+      game.buffer_ctx.drawImage(this.background, 0, 0);
       game.buffer_ctx.save();
 
       game.buffer_ctx.fillStyle = "rgb(50, 50, 50)";
@@ -322,26 +378,8 @@ var game = {
         var o = this.walls[i];
 
         switch(o.type){
-          case "wall":
-            var wi = o.w/10;
-            var hi = o.h/10;
-
-            // draw the stone.png on the walls
-            for(var i = 0; i < wi; i++){
-              for(var j = 0; j < hi; j++){
-                game.buffer_ctx.drawImage(game.resources.wall_image, o.x+(i*10), o.y+(j*10), 10, 10);
-              }
-            }
-
-            // game.buffer_ctx.fillStyle = "rgb(255,255,255)";  // color the walls white
-            // game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
-            break;
           case "slow":
             game.buffer_ctx.fillStyle = "rgb(155,155,255)";  // color the slow block blue-ish
-            game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
-            break;
-          case "booster":
-            game.buffer_ctx.fillStyle = "rgb(255,155,155)";  // color the boosters red-ish
             game.buffer_ctx.fillRect(o.x,o.y,o.w,o.h);
             break;
           case "reverse_gravity":
@@ -494,16 +532,16 @@ var game = {
   flip: function(){
     game.screen_ctx.drawImage(game.buffer, 0, 0);
     // game.buffer_ctx.clearRect(0, 0);
+
+    // game.buffer_ctx.drawImage(game.current_level.background);
     game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
     game.buffer_ctx.fillRect(0, 0, game.width, game.height);
   }
-
 }
 
 window.onload = function(){
   game.init('canvas', {key: true});
   game.ticker = setInterval(game.main, 1000/game.fps);
-
   // debugging stuff
 
   debug = $("#position");
