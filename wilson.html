@@ -93,6 +93,11 @@ var game = {
     this.booster_down = new Image();
     this.booster_down.src = "./images/booster_down.png";
 
+    // sound
+    this.sound_die = document.createElement('audio');
+    this.sound_die.setAttribute('src', './audio/Gun_Silencer.wav');
+
+
   },
 
   load_level: function(){
@@ -160,6 +165,7 @@ var game = {
 
           switch(o.type){
             case "wall":
+              game.resources.sound_die.play();
               game.reset_level();
               break;
 
