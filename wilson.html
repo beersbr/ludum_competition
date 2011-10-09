@@ -17,6 +17,13 @@
     float:left;
     display:block;
   }
+
+  #debug{
+    background: white;
+    display: block;
+    min-height: 100px;
+    color: black;
+  }
 </style>
 
 <script type="text/javascript" src="javascripts/keyHandler.js"></script>
@@ -37,8 +44,9 @@ var game = {
   fps_tick: 0,
   ticker: null,
 
-  game_state: "menu",
-  level_number: 2,
+  // game_state: "menu",
+  game_state: "playing",
+  level_number: 4,
 
   init: function(canvas_id, p){
     console.log("init");
@@ -191,14 +199,27 @@ var game = {
             case "level_finish":
               game.load_level();
               break;
+
+            case "teleporter":
+              this.x = o.to.x;
+              this.y = o.to.y;
+              break;
           }
 
         }
       }
 
-      this.x += (this.ax *= friction);
-      this.y += this.ay += gravity;
+      min = this.ay < min ? this.ay : min;
+      max = this.ay > max ? this.ay : max;
+
+      this.ax *= friction
+      this.ay += gravity;
+
+      this.x += this.ax;
+      this.y += this.ay;
       this.rot += this.ax*5;
+
+      debug.html((this.x).toFixed(2)+", "+(this.y).toFixed(2)+"<br />"+(this.ax).toFixed(2)+", "+(this.ay).toFixed(2)+"<br />"+max.toFixed(2)+", "+min.toFixed(2));
 
     }
 
@@ -208,11 +229,13 @@ var game = {
       // we are assuming that we are a cirlce here
       //if(this.shape == "circle"){}
 
-      var dist_x = Math.abs(this.x - (shape.x + (shape.w/2)));
-      var dist_y = Math.abs(this.y - (shape.y + (shape.h/2)));
+      // TODO: Fix the collision with the bouncers 
+      // making this a preemptive collision detection function.
+      var dist_x = Math.abs((this.x) - (shape.x + (shape.w/2)));
+      var dist_y = Math.abs((this.y) - (shape.y + (shape.h/2)));
 
-      if(dist_x > ((shape.w/2) + this.width)){ return false; }
-      if(dist_y > ((shape.h/2) + this.width)){ return false; }
+      if(dist_x > ((shape.w/2) + (this.width))){ return false; }
+      if(dist_y > ((shape.h/2) + (this.width))){ return false; }
 
       if(dist_x <= (shape.w/2)){ return true; }
       if(dist_y <= (shape.h/2)){ return true; }
@@ -227,7 +250,7 @@ var game = {
       game.buffer_ctx.translate(this.x, this.y);                                  // move the origin x, y of the canvas to (this.x, this.y)
       game.buffer_ctx.rotate(this.rot * Math.PI/180);                             // rotate the canvas
       game.buffer_ctx.drawImage(this.image, 0-this.width, 0-this.width, 20, 20);  // draw the image at 0, 0 because we are at the origin
-      game.buffer_ctx.restore();                                                  // pop the canvas state restoring the origin to the top left corner
+      game.buffer_ctx.restore();                                                 // pop the canvas state restoring the origin to the top left corner
 
       game.buffer_ctx.drawImage(this.image_overlay, this.x-this.width, this.y-this.width, 20, 20); // draw the shadow overlay onto the ball
       return true;
@@ -239,33 +262,41 @@ var game = {
     this.walls = level_json.walls;
 
     // add the special data for certian types.
-    for(i in this.walls){
+    for(var i in this.walls){
 
       // add stuff for the moving wall
-      if(this.walls[i].type == "moving_wall"){
-        this.walls[i].static_width = this.walls[i].w;
-        this.walls[i].static_x = this.walls[i].x;
-        this.walls[i].static_height = this.walls[i].h;
-        this.walls[i].static_y = this.walls[i].y;
-        this.walls[i].switch = -1;
+      switch(this.walls[i].type){
+        case "moving_wall":
+          this.walls[i].static_width = this.walls[i].w;
+          this.walls[i].static_x = this.walls[i].x;
+          this.walls[i].static_height = this.walls[i].h;
+          this.walls[i].static_y = this.walls[i].y;
+          this.walls[i].switch = -1;
 
-        // set the offset so the walls don't appear so uniform.
-        switch(this.walls[i].direction){
-          case "l":
-            this.walls[i].x += this.walls[i].offset;
-            this.walls[i].w -= this.walls[i].offset;
-            break;
-          case "r":
-            this.walls[i].w -= this.walls[i].offset;
-            break;
-          case "u":
-            this.walls[i].y += this.walls[i].offset;
-            this.walls[i].h -= this.walls[i].offset;
-            break;
-          case "d":
-            this.walls[i].h -= this.walls[i].offset;
-            break;
-        }
+          // set the offset so the walls don't appear so uniform.
+          switch(this.walls[i].direction){
+            case "l":
+              this.walls[i].x += this.walls[i].offset;
+              this.walls[i].w -= this.walls[i].offset;
+              break;
+            case "r":
+              this.walls[i].w -= this.walls[i].offset;
+              break;
+            case "u":
+              this.walls[i].y += this.walls[i].offset;
+              this.walls[i].h -= this.walls[i].offset;
+              break;
+            case "d":
+              this.walls[i].h -= this.walls[i].offset;
+              break;
+          }
+          break;
+
+        case "teleporter":
+          // have to find the coords of the other teleporter.
+
+
+          break;
       }
     }
 
@@ -348,6 +379,12 @@ var game = {
                 break;
             }
             game.buffer_ctx.fillRect(o.x, o.y, o.w, o.h);
+            break;
+
+          case "teleporter":
+            game.buffer_ctx.fillStyle = "rgb(100, 0, 100)";
+            game.buffer_ctx.fillRect(o.x, o.y, 10, 10);
+            game.buffer_ctx.fillRect(o.to.x, o.to.y, 10, 10);
             break;
         }
         
@@ -442,6 +479,12 @@ window.onload = function(){
   game.init('canvas', {key: true});
   game.ticker = setInterval(game.main, 1000/game.fps);
 
+  // debugging stuff
+
+  debug = $("#position");
+  max = 0;
+  min = 0;
+
 }
 
 </script>
@@ -455,6 +498,11 @@ window.onload = function(){
     press G to restart <br />
     <br />
     Your goal is to get to the purple door. Do that by not touching any of the walls which are WHITE. The PINK walls move and, though they are not white, they will also kill you. Good luck!
+    <br />
+    <br />
+    <div id='debug'>
+      <div id='position'></div>
+    </div>
   </div>
   <div class'canvas_container'>
     <canvas id="canvas" width='640' height='480'></canvas>

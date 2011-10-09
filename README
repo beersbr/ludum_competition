@@ -13,6 +13,11 @@ is hard to plug through here are the line numbers:
 
 TODO: 
   + Make the collision pre-emptive so we don't have any phasing through blocks
+    > Make sure collision works with all the wall types. Currently the bouncers accelerate the player enough
+      to make the player pass through thin walls.
+  + Change the width and the height of the teleporters so they are not static and can be changed so that they 
+    are drawn to the screen properly.
+  + Fix the teleportation so the player is drawn to the center of the destination.
 
 Documentation: 
 
@@ -77,3 +82,13 @@ Block types:
   power: [n > 0.0] for how much boost this block adds to the players velocity
   - Example:
     {"x": 10, "y": 10, "w": 150, "h": 70, "type": "booster", "direction": "d", "power": 0.3 }
+
++ Teleporters:
+  - This type of block will teleport the player to a given position on collision.
+  x: x coordinate
+  y: y coordinate
+  w: width of block (currently staticly drawn )
+  h: height of block (currently staticly drawn )
+  to: the position of the destination as a hash.
+  - Example:
+    {"x": 320, "y": 400, "w": 10, "h": 10, "type": "teleporter", "to": {"x": 100, "y": 200}}
