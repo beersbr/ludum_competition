@@ -1,0 +1,25 @@
+{
+	"walls":[
+		{"x": 0,   "y": 0,   "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 470, "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 630, "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 100, "y": 90,  "w": 10,  "h": 380, "type": "wall"},
+		{"x": 110, "y": 90,  "w": 160,  "h": 10, "type": "wall"},
+		{"x": 260, "y": 90,  "w": 10,  "h": 80, "type": "wall"},
+		{"x": 200, "y": 210, "w": 270,  "h": 10, "type": "wall"},
+		{"x": 310, "y": 90,  "w": 250,  "h": 10, "type": "wall"},
+		{"x": 470, "y": 100,  "w": 10,  "h": 310, "type": "wall"},
+		{"x": 550, "y": 150,  "w": 80,  "h": 10, "type": "wall"},
+		{"x": 480, "y": 230,  "w": 80,  "h": 10, "type": "wall"},
+		{"x": 550, "y": 330,  "w": 80,  "h": 10, "type": "wall"},
+		{"x": 10,  "y": 10,  "w": 160, "h": 80, "type": "booster", "power": 0.4, "direction": "r"},
+		{"x": 400, "y": 410,  "w": 160, "h": 60, "type": "booster", "power": 0.3, "direction": "u"},
+		{"x": 310, "y": 100,  "w": 160, "h": 110, "type": "booster", "power": 0.4, "direction": "l"},
+		{"x": 230, "y": 320,  "type": "text", "text": "Good luck!"},
+		{"x": 150, "y": 160,  "type": "text", "text": "Trap? -->"},
+		{"x": 150, "y": 340,  "type": "text", "text": "This is the last of my demo levels, Thank you!"},
+		{"x": 160, "y": 420, "w": 10,  "h": 10,  "type": "level_finish"}
+	],
+	"start": {"x": 60, "y": 420}
+}

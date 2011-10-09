@@ -1,0 +1,19 @@
+{
+	"walls":[
+		{"x": 0,   "y": 0,   "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 470, "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 630, "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 200, "y": 390, "type": "text", "text": "And as you progress through each"},
+		{"x": 200, "y": 410, "type": "text", "text": "level your journey will get harder."},
+		{"x": 315, "y": 430, "w": 10,  "h": 10,  "type": "level_finish"},
+		{"x": 190, "y": 80,  "type": "text", "text": "You won't start in the same spot each time."},
+		{"x": 120, "y": 207,   "w": 400,  "h": 20, "type": "wall"},
+		{"x": 120, "y": 207,   "w": 400,  "h": 20, "type": "wall"},
+		{"x": 10, "y": 120,   "w": 110,  "h": 200, "type": "booster", "power": 0.35, "direction": "r"},
+		{"x": 520, "y": 120,   "w": 110,  "h": 200, "type": "booster", "power": 0.35, "direction": "l"},
+		{"x": 130, "y": 170,  "type": "text", "text": "<-- This is a booster. They are not all the same. Try it out!"}
+
+	],
+	"start": {"x": 315, "y": 40}
+}
