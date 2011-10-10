@@ -103,7 +103,8 @@ var game = {
   load_level: function(){
     var current_level = {};
 
-    $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
+    // $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
+    $.ajax({url:'./level_pack_1/level99.json',
             async: false,
             success: function(data){
               current_level = data;
@@ -200,19 +201,19 @@ var game = {
             case "bounce":
               switch(o.direction){
                 case "l":
-                  this.ax -= 3.3;
+                  this.ax -= o.power;
                   this.ax *= -1;
                   break;
                 case "r":
-                  this.ax += 3.3;
+                  this.ax += o.power;
                   this.ax *= -1;
                   break;
                 case "u":
-                  this.ay += 3.3;
+                  this.ay += o.power;
                   this.ay *= -1;
                   break;
                 case "d":
-                  this.ay -= 3.3;
+                  this.ay -= o.power;
                   this.ay *= -1;
                   break;
               }

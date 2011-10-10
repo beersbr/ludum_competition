@@ -1,0 +1,25 @@
+{
+	"walls":[
+	  {"x": 0,   "y": 0,   "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 470, "w": 640, "h": 10,  "type": "wall"},
+		{"x": 0,   "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		{"x": 630, "y": 0,   "w": 10,  "h": 480, "type": "wall"},
+		
+		{"x": 10,  "y": 10,  "w": 620, "h": 30, "type": "booster", "power": 0.1, "direction": "d"},
+		{"x": 10,  "y": 70,  "w": 400, "h": 30, "type": "booster", "power": 0.4, "direction": "u"},
+		{"x": 10, "y": 100,  "w": 400,  "h": 20, "type": "wall"},
+		
+		{"x": 470, "y": 120,  "w": 20,  "h": 10, "type": "bounce", "power": 0.4, "direction": "u"},
+		{"x": 490, "y": 130,  "w": 10,  "h": 50, "type": "bounce", "power": 0.4, "direction": "r"},
+		{"x": 550, "y": 130,  "w": 10,  "h": 50, "type": "bounce", "power": 0.4, "direction": "l"},
+		{"x": 560, "y": 120,  "w": 20,  "h": 10, "type": "bounce", "power": 0.4, "direction": "u"},
+		
+		{"x": 170, "y": 400, "w": 150, "h": 50, "type": "moving_wall", "direction": "l", "speed": 0.6, "offset": 30},
+		
+		{"x": 410, "y": 100,  "w": 20,  "h": 80, "type": "wall"},
+		
+		{"x": 590, "y": 430, "w": 20,  "h": 20,  "type": "level_finish"},
+		{"x": 265, "y": 207, "w": 20,  "h": 20,  "type": "wall"}
+	],
+	"start": {"x": 40, "y": 40}
+}
