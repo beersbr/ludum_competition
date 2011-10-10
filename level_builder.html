@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>level builder</title>
+<style type="text/css">
+
+body{
+	background: #330033;
+}
+
+table{
+	background: grey;
+}
+
+#canvas_container{
+	background: white;
+}
+
+#canvas_container div{
+	width: 10px;
+	height: 10px;
+	border: 1px solid black;
+	float:left;
+}
+
+</style>
+<script type="text/javascript" src="javascripts/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var map_data = [];
+	
+
+	var container = $('#canvas_container');
+	$('#generate').click(function(){
+		div_str = "";
+		var width = parseInt($("#xres").val());
+		var height = parseInt($("#yres").val());
+
+		$("#canvas_container").css('width', (width+(2*(width/10)))+"px");
+		$("#canvas_container").css('height', (height+(2*(height/10)))+"px");
+
+		for(var i = 0; i < (height/10); i++){
+			for(var j = 0; j < (width/10); j++){
+				div_str += "<div class='pix' data-x='"+j+"' data-y='"+i+"' ></div>"
+			}
+		}
+
+		container.html(div_str);
+		draw = false;
+
+		$('.pix').click(function(){
+			draw = !draw;
+		});
+
+		$('.pix').hover(function(){
+			if(draw)
+				$(this).css('background', 'grey');
+		});
+
+	});
+	
+});
+</script>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>X resolution:</td><td><input type="text" name="xres" id="xres" /></td>
+		</tr>
+		<tr>
+			<td>Y resolution:</td><td><input type="text" name="yres" id="yres" /></td>
+		</tr>
+		<tr>
+			<td colspan='2'><input type="button" name="generate_map" value="generate_map" id="generate" /></td>
+		</tr>
+	</table>
+	<div id='canvas_container'>
+
+	</div>
+</body>
+</html>
