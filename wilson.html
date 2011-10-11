@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>willlson</title>
+<title>willlson</title>
 <style>
   body{
     background: #330033;
@@ -104,7 +104,7 @@ var game = {
     var current_level = {};
 
     // $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
-    $.ajax({url:'./level_pack_1/level99.json',
+    $.ajax({url:'./level_builder/level_data.json',
             async: false,
             success: function(data){
               current_level = data;
@@ -551,7 +551,7 @@ window.onload = function(){
   game.ticker = setInterval(game.main, 1000/game.fps);
   // debugging stuff
 
-  debug = $("#position");
+  // debug = $("#position");
   max = 0;
   min = 0;
 

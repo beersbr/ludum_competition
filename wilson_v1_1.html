@@ -2,56 +2,108 @@
 <html>
 <head>
 	<title>Wilson v1.1</title>
-	<script type="text/javascript" src="javascripts/keyHandler.js"></script>
+	<script type="text/javascript" src="javascripts/keyHandler_1.1.js"></script>
 	<script type="text/javascript" src="javascripts/jquery.js"></script>
 <script type="text/javascript">
-var Game = {
-  height: 0,
+
+var JSGame = {
+
   width: 0,
-  screen: null,
-  screen_ctx: null,
-  buffer: null,
-  buffer_ctx: null,
+  height: 0,
+  screen: {},
+  buffer: {},
+
   fps: 60,
-  key: null,
 
-  fps_tick: 0,
-  ticker: null,
+  node: function(p){
+    this.x = p.x || 0;
+    this.y = p.y || 0;
+    this.w = p.w || 0;
+    this.h = p.h || 0;
 
-  state: "playing",
-  level_number: 0,
-
-  init: function(canvas_id, p){
-	  game.screen = document.getElementById(canvas_id);
-	  game.screen_ctx = game.screen.getContext('2d');
-
-	  game.width = game.screen.width;
-	  game.height = game.screen.height;
-
-	  game.buffer = document.createElement('canvas');
-	  game.buffer.width = game.width;
-	  game.buffer.height = game.height;
-	  game.buffer_ctx = game.buffer.getContext('2d');
-
-	  game.resources = new game.load_resources();
-
-	  p = p || {};
-	  if(p.key == true){
-	    game.key = new keyHandler;
-	    console.log("Using keyboard");
-	  }
-
-	  // prepare game objects
-	  game.player = new game.node({ w: 10, h: 10, shape: "circle", image: "./images/ball.png"});
-	  game.load_level();
-	  game.space = new game.world({gravity: 0.11, friction: 0.95, level: game.level});
-
-	  return true;
   },
+
+  resources: function(name, location, type){
+    
+  },
+
+  // manipulates the levels and menues
+  scenes: {
+    scene: function(p){
+
+      if(p.background[0] == "#"){
+        this.background = p.background;
+      }else{
+        this.background = new Image();
+        this.background.src = p.background || "";
+      }
+
+    },
+
+    scenes: [],
+    current_scene: {},
+
+    next: function(key, transition){
+
+    },
+    
+    add: function(key, p){
+      JSGame.scenes.scenes.push(new JSGame.scenes.scene({'background': p.background}));
+    },
+
+    draw: function(key){
+      
+    },
+
+    draw_transition: function(){
+      
+    }
+
+  },
+
+  init: function(p){
+    JSGame.width = p.w || 0;
+    JSGame.height = p.h || 0;
+
+    JSGame.screen.img = getELementById('canvas');
+    JSGame.screen.ctx = JSGame.screen.img.getContext('2d');
+
+    JSGame.buffer.img = document.createElement('canvas');
+    JSGame.buffer.img.width = JSGame.screen.img.width;
+    JSGame.buffer.img.height = JSGame.screen.img.height;
+    JSGame.buffer.ctx = JSGame.buffer.ctx.getContext('2d');
+
+    JSGame.key = new KeyHandler();
+
+  },
+
+  draw: {
+    draw_func: function(){}
+
+  },
+
+  loop: function(){
+
+
+
+    JSGame.draw();
+  }
+
 }
+
+window.onload = function(){
+
+  JSGame.scenes.add(1, {background: "#00FFFF"});
+  JSGame.scenes.add(2, {background: "#FFFFFF"});
+  JSGame.scenes.add(3, {background: "#0000FF"});
+  JSGame.scenes.add(4, {background: "#FF00FF"});
+
+  setInterval(JSGame.loop(), 1000/JSGame.fps);
+}
+
 </script>
 </head>
 <body>
-
+  <canvas id="canvas"></canvas>
 </body>
 </html>

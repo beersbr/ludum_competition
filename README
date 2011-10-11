@@ -19,11 +19,15 @@ TODO:
     are drawn to the screen properly.
   + Fix the teleportation so the player is drawn to the center of the destination.
   + Add insurance to the fact that we are using 10's as a base. Every walls width and height mod 10 must be 0;
-  + Make all the static walls in the background an image so we only have to draw them once. The game will load, and
-    take all of the wall drawn on the screen and save that image and use it over and over so that draw calls
-    don't stack up.
   + When the player has completed the last level the game should move to another screen gracefully.
   + Move the "player_finish" block out of the walls section and into its own property for the level. (This would take away the ability to make finish points arbutrary sizes).
+  + Finish the static walls creation
+
+ADDITIONS:
+  The Level Builder is a small sinatra app that will help in the creation of levels letting you visualize what you are doing. You click once to start drawing and again to stop.
+  Right now all you can draw are walls. The start position is statically set at 300, 300.
+
+  + The level builder now works in a crude way. It produces slow levels creating a wall for each block instead of cells.
 
 Documentation: 
 
