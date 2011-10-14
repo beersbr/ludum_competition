@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<title>SpriteHandler</title>
+<style type="text/css" media="screen">
+  body{
+    background: #440033;
+  }
+</style>
+<script src="javascripts/SpriteHandler.js" type="text/javascript" charset="utf-8" async defer></script>
+<script>
+
+window.onload = function(){
+  cvs = document.getElementById('canvas');
+  ctx = cvs.getContext('2d');
+
+  s = new SpriteHandler({
+    buffer: ctx,
+    src: "images/bird3.png",
+    fps: 16,
+    fw: 160,
+    fh: 146
+  });
+
+  s.init("a", {frames: 8});
+
+
+  function loop(){
+    ctx.clearRect(0, 0, 640, 480);
+    s.draw("a");
+  }
+
+  setInterval(loop, 1000/32);
+
+}
+</script>
+</head>
+<body>
+  <canvas id='canvas' width='640px' height='480px'>
+    
+  </canvas>
+</body>
+</html>
