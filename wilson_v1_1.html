@@ -1,109 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Wilson v1.1</title>
-	<script type="text/javascript" src="javascripts/keyHandler_1.1.js"></script>
-	<script type="text/javascript" src="javascripts/jquery.js"></script>
-<script type="text/javascript">
-
-var JSGame = {
-
-  width: 0,
-  height: 0,
-  screen: {},
-  buffer: {},
-
-  fps: 60,
-
-  node: function(p){
-    this.x = p.x || 0;
-    this.y = p.y || 0;
-    this.w = p.w || 0;
-    this.h = p.h || 0;
-
-  },
-
-  resources: function(name, location, type){
-    
-  },
-
-  // manipulates the levels and menues
-  scenes: {
-    scene: function(p){
-
-      if(p.background[0] == "#"){
-        this.background = p.background;
-      }else{
-        this.background = new Image();
-        this.background.src = p.background || "";
-      }
-
-    },
-
-    scenes: [],
-    current_scene: {},
-
-    next: function(key, transition){
-
-    },
-    
-    add: function(key, p){
-      JSGame.scenes.scenes.push(new JSGame.scenes.scene({'background': p.background}));
-    },
-
-    draw: function(key){
-      
-    },
-
-    draw_transition: function(){
-      
-    }
-
-  },
-
-  init: function(p){
-    JSGame.width = p.w || 0;
-    JSGame.height = p.h || 0;
-
-    JSGame.screen.img = getELementById('canvas');
-    JSGame.screen.ctx = JSGame.screen.img.getContext('2d');
-
-    JSGame.buffer.img = document.createElement('canvas');
-    JSGame.buffer.img.width = JSGame.screen.img.width;
-    JSGame.buffer.img.height = JSGame.screen.img.height;
-    JSGame.buffer.ctx = JSGame.buffer.ctx.getContext('2d');
-
-    JSGame.key = new KeyHandler();
-
-  },
-
-  draw: {
-    draw_func: function(){}
-
-  },
-
-  loop: function(){
-
-
-
-    JSGame.draw();
+<title>Wilson v1.1</title>
+<style>
+  body{
+    background: #330033;
+  }
+  .info{
+    color: white;
+    float: left;
+    display:block;
+    padding: 10px;
+    width: 300px;
+  }
+  .canvas_container{
+    float:left;
+    display:block;
   }
 
+  #debug{
+    background: white;
+    display: block;
+    min-height: 100px;
+    color: black;
+  }
+</style>
+
+<script type="text/javascript" src="javascripts/KeyHandler_1.1.js"></script>
+<script type="text/javascript" src="javascripts/ParticleHandler.js"></script>
+<script type="text/javascript" src="javascripts/jquery.js"></script>
+<script type="text/javascript">
+
+var Game = {
+  // game variables
+
+  loop: function(){
+    Game.ctx.clearRect(0, 0, 640, 480);
+    p.update();
+    p.draw();
+  }
 }
 
 window.onload = function(){
 
-  JSGame.scenes.add(1, {background: "#00FFFF"});
-  JSGame.scenes.add(2, {background: "#FFFFFF"});
-  JSGame.scenes.add(3, {background: "#0000FF"});
-  JSGame.scenes.add(4, {background: "#FF00FF"});
+  Game.cvs = document.getElementById("canvas");
+  Game.ctx = Game.cvs.getContext('2d');
 
-  setInterval(JSGame.loop(), 1000/JSGame.fps);
+  p = new ParticleHandler({
+    x: 100,
+    y: 100,
+    direction: 90,
+    speed: 1,
+    friction: 0.95,
+    ctx: Game.ctx,
+    r: 100,
+    g: 100,
+    b: 100,
+    count: 30
+  });
+
+  f = setInterval(Game.loop, 1000/60);
 }
 
 </script>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
+  <canvas id="canvas" width='640px' height='480px'></canvas>
 </body>
 </html>

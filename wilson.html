@@ -43,6 +43,7 @@ var game = {
 
   fps_tick: 0,
   ticker: null,
+  fps_ticker: 0,
 
   // game_state: "menu",
   game_state: "playing",
@@ -103,8 +104,13 @@ var game = {
   load_level: function(){
     var current_level = {};
 
+    $.ajax({url:'./level_pack_1/level0.json',
     // $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
+<<<<<<< HEAD
     $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
+=======
+    // $.ajax({url:'./level_builder/level_data.json',
+>>>>>>> 8ecf3b27ad6b2c9fbad1ad9ad85b5a9ab97afa97
             async: false,
             success: function(data){
               current_level = data;
@@ -247,7 +253,7 @@ var game = {
       this.y += this.ay;
       this.rot += this.ax*5;
 
-      // debug.html((this.x).toFixed(2)+", "+(this.y).toFixed(2)+"<br />"+(this.ax).toFixed(2)+", "+(this.ay).toFixed(2)+"<br />"+max.toFixed(2)+", "+min.toFixed(2));
+    debug.html((this.x).toFixed(2)+", "+(this.y).toFixed(2)+"<br />"+(this.ax).toFixed(2)+", "+(this.ay).toFixed(2)+"<br />"+max.toFixed(2)+", "+min.toFixed(2));
 
     }
 
@@ -533,6 +539,7 @@ var game = {
       game.player.draw();
 
       game.flip();
+      game.fps_ticker++;
     }
   },
 
@@ -543,7 +550,13 @@ var game = {
     // game.buffer_ctx.drawImage(game.current_level.background);
     game.buffer_ctx.fillStyle = "rgb(0, 0, 0)";
     game.buffer_ctx.fillRect(0, 0, game.width, game.height);
+  },
+
+  fps_func: function(){
+    console.log("fps: "+game.fps_ticker);
+    game.fps_ticker = 0;
   }
+
 }
 
 window.onload = function(){
@@ -551,7 +564,9 @@ window.onload = function(){
   game.ticker = setInterval(game.main, 1000/game.fps);
   // debugging stuff
 
-  // debug = $("#position");
+  // game.fps_ticker_interval = setInterval(game.fps_func, 1000);
+
+  debug = $("#position");
   max = 0;
   min = 0;
 
