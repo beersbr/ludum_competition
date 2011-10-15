@@ -26,7 +26,7 @@
   }
 </style>
 
-<script type="text/javascript" src="javascripts/keyHandler.js"></script>
+<script type="text/javascript" src="javascripts/KeyHandler.js"></script>
 <script type="text/javascript" src="javascripts/jquery.js"></script>
 <script>
 
@@ -66,7 +66,7 @@ var game = {
 
     p = p || {};
     if(p.key == true){
-      game.key = new keyHandler;
+      game.key = new KeyHandler;
       console.log("Using keyboard");
     }
 
@@ -104,13 +104,8 @@ var game = {
   load_level: function(){
     var current_level = {};
 
-    $.ajax({url:'./level_pack_1/level0.json',
     // $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
-<<<<<<< HEAD
     $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
-=======
-    // $.ajax({url:'./level_builder/level_data.json',
->>>>>>> 8ecf3b27ad6b2c9fbad1ad9ad85b5a9ab97afa97
             async: false,
             success: function(data){
               current_level = data;

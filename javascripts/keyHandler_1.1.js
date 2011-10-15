@@ -14,7 +14,7 @@ catch(err){
   }
 }
 
-function keyHandler(){
+function KeyHandler(){
   this.setKey = function(key){
     // If we are setting the key for the first time make sure it has a value
     if(this.keyStates[key.keyCode] == null) this.keyStates[key.keyCode] = false;

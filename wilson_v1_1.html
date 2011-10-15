@@ -31,13 +31,202 @@
 <script type="text/javascript" src="javascripts/jquery.js"></script>
 <script type="text/javascript">
 
+// -----------------------------------------------------------------------------------------------------
+// GAME NAMESPACE
+// -----------------------------------------------------------------------------------------------------
+
 var Game = {
-  // game variables
+  // ---------------------------------------------------------------------------------------------------
+  // VARIABLES
+  // ---------------------------------------------------------------------------------------------------
+
+  fps: 60,
+  height: 0,
+  width: 0,
+  screen: {
+    cvs: null,
+    ctx: null
+  },
+
+  buffer: {
+    cvs: null,
+    ctx: null
+  },
+
+  // ---------------------------------------------------------------------------------------------------
+  // OBJECTS
+  // ---------------------------------------------------------------------------------------------------
+
+  World: function(p){
+    this.friction = 0.92;
+    this.gravity = 0.3;
+  },
+
+  Player: function(p){
+    // member variables
+    this.x = p.x;
+    this.y = p.y;
+    this.width = p.w;
+    this.height = p.h;
+    this.ax = 0;
+    this.ay = 0;
+
+    this.image = p.image_obj;
+
+    this.rot = 0;
+
+    this.thruster_emitters = [];
+    this.thruster_emitters[0] = new ParticleHandler({
+      dist: 30,
+      x: this.x-8,
+      y: this.y+10,
+      direction: this.rot+90,
+      speed: 1,
+      friction: 0.95,
+      ctx: Game.buffer.ctx,
+      r: 100,
+      g: 100,
+      b: 100,
+      count: 30
+    });
+
+    this.thruster_emitters[1] = new ParticleHandler({
+      dist: 30,
+      x: this.x+8,
+      y: this.y+10,
+      direction: this.rot+90,
+      speed: 1,
+      friction: 0.95,
+      ctx: Game.buffer.ctx,
+      r: 100,
+      g: 100,
+      b: 100,
+      count: 30
+    });
+
+    this.update = function(){
+      this.x += (this.ax *= 0.87);
+      this.rot = (this.rot += (this.ax*1.5)) * 0.87;
+      this.y += this.ay *= 0.87;
+    }
+
+    this.draw = function(){
+      Game.buffer.ctx.save();
+      Game.buffer.ctx.translate(this.x, this.y);
+      Game.buffer.ctx.rotate((this.rot) * Math.PI/180);
+
+      Game.buffer.ctx.drawImage(this.image, 0-(this.image.width/2), 0-(this.image.height/2), this.image.width, this.image.height);
+      Game.buffer.ctx.restore();
+
+      this.thruster_emitters[0].update({
+        x: this.x+8,
+        y: this.y+10,
+        direction: this.rot+90,
+        speed: 1
+      });
+      this.thruster_emitters[0].draw();
+
+      this.thruster_emitters[1].update({
+        x: this.x-8,
+        y: this.y+10,
+        direction: this.rot+90,
+        speed: 1
+      });
+      this.thruster_emitters[1].draw();
+
+
+      return true;
+    }
+
+  },
+
+  ResourceHandler: function(){
+    this.res = {};
+    this.size = 0;
+
+    this.load = function(id, type, file){
+      switch(type){
+        case "sound":
+          this[id] = new Audio();
+          this[id].preload = 'auto';
+          this[id].src = file;
+          this.size++;
+          break;
+        case "image":
+          this[id] = new Image();
+          this[id].src = file;
+          this.size++;
+          break;
+      }
+    }
+  },
+
+  // ---------------------------------------------------------------------------------------------------
+  // FUNCTIONS
+  // ---------------------------------------------------------------------------------------------------
+
+  init: function(p){
+    // Create the buffer and the back buffer
+    Game.screen.cvs = document.getElementById(p.canvas);
+    Game.screen.ctx = Game.screen.cvs.getContext('2d');
+    Game.buffer.cvs = document.createElement('canvas');
+    Game.buffer.cvs.width = Game.screen.cvs.width;
+    Game.buffer.cvs.height = Game.screen.cvs.height;
+    Game.buffer.ctx = Game.buffer.cvs.getContext('2d');
+
+    Game.width = Game.screen.cvs.width;
+    Game.height = Game.screen.cvs.height;
+
+    // Initialize the input
+    Game.key = new KeyHandler();
+
+    // load the resources
+    Game.resources = new Game.ResourceHandler();
+    Game.resources.load("ship", "image", "images/dev/ship.png");
+
+    // this will be dynamic depending on the level
+    Game.player = new Game.Player({
+      x: 300,
+      y: 300,
+      w: 100,
+      h: 100,
+      image_obj: Game.resources.ship
+    });
+
+    return true;
+  },
 
   loop: function(){
-    Game.ctx.clearRect(0, 0, 640, 480);
-    p.update();
-    p.draw();
+
+    if(Game.key.keyIs('w')){
+      Game.player.ay -= 1;
+      
+    }
+    if(Game.key.keyIs('s')){
+      Game.player.ay += 1;
+      
+    }
+    if(Game.key.keyIs('a')){
+      Game.player.ax -= 1;
+      
+    }
+    if(Game.key.keyIs('d')){
+      Game.player.ax += 1;
+      
+    }
+
+    // Batch the update calls
+    Game.player.update();
+
+
+    // Batch the drawing calls
+
+    Game.player.draw();
+    Game.screen.ctx.drawImage(Game.buffer.cvs, 0, 0);
+
+    Game.buffer.ctx.fillStyle = "rgb(0,0,0)";
+    Game.buffer.ctx.fillRect(0, 0, 640, 480);
+
   }
 }
 
@@ -45,21 +234,11 @@ window.onload = function(){
 
   Game.cvs = document.getElementById("canvas");
   Game.ctx = Game.cvs.getContext('2d');
-
-  p = new ParticleHandler({
-    x: 100,
-    y: 100,
-    direction: 90,
-    speed: 1,
-    friction: 0.95,
-    ctx: Game.ctx,
-    r: 100,
-    g: 100,
-    b: 100,
-    count: 30
+  Game.init({
+    canvas: "canvas"
   });
 
-  f = setInterval(Game.loop, 1000/60);
+  f = setInterval(Game.loop, 1000/Game.fps);
 }
 
 </script>

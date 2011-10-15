@@ -27,9 +27,9 @@ function Particle(p){
     this.x += (this.dx *= this.friction);
     this.y += (this.dy *= this.friction);
 
-    this.travel += this.travel || pythag(this.dx, this.dy);
+    // this.travel += pythag(this.dx, this.dy);
 
-    if(this.travel > this.max_dist || (this.dx+this.dy) < 1){
+    if(Math.abs(this.dx+this.dy) < 1){
       return false;
     }
     return true;
@@ -59,8 +59,6 @@ function ParticleHandler(p){
   this.particles = [];
   this.ctx = p.ctx;
 
-  console.log(this.ctx);
-
   // init the base set of particles
   for(var i = 0; i < this.count; i++){
     var color = random(150);
@@ -71,13 +69,20 @@ function ParticleHandler(p){
       r: (this.r + color),
       g: (this.g + color),
       b: (this.b + color),
-      direction: (this.direction-10+random(20)),
+      direction: ((this.direction-10)+random(20)),
       speed: (this.speed+random(3)),
       friction: this.friction
     }));
   }
 
-  this.update = function(){
+  this.update = function(p){
+
+    this.x = p.x || this.x;
+    this.y = p.y || this.y;
+    this.speed = p.speed || this.speed;
+    this.direction = p.direction || this.direction;
+    this.friction = p.friction || this.friction;
+
     for(var i = 0; i < this.count; i++){
       if(!(this.particles[i].update())){
         var color = random(150);
@@ -89,7 +94,7 @@ function ParticleHandler(p){
           r: (this.r + color),
           g: (this.g + color),
           b: (this.b + color),
-          direction: (this.direction-10+random(20)),
+          direction: ((this.direction-10)+random(20)),
           speed: (this.speed+(random(100)/50)),
           friction: 0.97
         }));
