@@ -104,7 +104,7 @@ var game = {
     var current_level = {};
 
     // $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
-    $.ajax({url:'./level_builder/level_data.json',
+    $.ajax({url:'./level_pack_1/level'+(game.level_number+=1)+'.json',
             async: false,
             success: function(data){
               current_level = data;
