@@ -44,9 +44,80 @@ function Particle(p){
   }
 }
 
+function ParticleHandlerSpots(p){
+  this.direction = p.direction || -1;
+  this.x = p.x || 0;
+  this.y = p.y || 0;
+  this.w = p.w || 640;
+  this.h = p.h || 480;
+
+  this.friction = p.friction || 0.92;
+  this.r = p.r || 255;
+  this.g = p.g || 255;
+  this.b = p.b || 255;
+
+  this.speed = p.speed || 1;
+
+  this.particles = [];
+  this.ctx = p.ctx || {};
+  this.count = p.count || 50;
+  
+  for(var i = 0; i < this.count; i++){
+    var color = random(150);
+    var direction = (this.direction) == -1 ? random(360) : this.direction;
+
+    this.particles.push(new Particle({
+      x: random(this.w)+this.x,
+      y: random(this.h)+this.y,
+      ctx: this.ctx,
+      r: (this.r + color),
+      g: (this.g + color),
+      b: (this.b + color),
+      direction: direction,
+      speed: (this.speed+random(4)),
+      friction: this.friction
+    }));
+  }
+
+  this.update = function(p){
+
+    this.x = p.x || this.x;
+    this.y = p.y || this.y;
+    this.speed = p.speed || this.speed;
+    this.direction = p.direction || this.direction;
+    this.friction = p.friction || this.friction;
+
+    for(var i = 0; i < this.count; i++){
+      if(!(this.particles[i].update())){
+        var color = random(150);
+        var direction = this.direction == -1 ? random(360) : this.direction;
+
+        this.particles.splice(i, 1);
+        this.particles.push(new Particle({
+          x: random(this.w)+this.x,
+          y: random(this.h)+this.y,
+          ctx: this.ctx,
+          r: (this.r + color),
+          g: (this.g + color),
+          b: (this.b + color),
+          direction: direction,
+          speed: (this.speed+random(4)),
+          friction: this.friction
+        }));
+      }
+    }
+  }
+
+  this.draw = function(){
+    for(var i in this.particles){
+      this.particles[i].draw();
+    }
+  }
+
+}
 
 // For now this is only a fountain
-function ParticleHandler(p){
+function ParticleHandlerFountain(p){
   this.direction = p.direction;
   this.x = p.x;
   this.y = p.y;
@@ -94,8 +165,8 @@ function ParticleHandler(p){
           r: (this.r + color),
           g: (this.g + color),
           b: (this.b + color),
-          direction: ((this.direction-10)+random(20)),
-          speed: (this.speed+(random(100)/50)),
+          direction: ((this.direction-15)+random(30)),
+          speed: (this.speed+(random(200)/100)),
           friction: 0.97
         }));
       }

@@ -58,8 +58,20 @@ var Game = {
   // ---------------------------------------------------------------------------------------------------
 
   World: function(p){
-    this.friction = 0.92;
-    this.gravity = 0.3;
+    this.friction = p.friction || 0.92;
+    this.gravity = p.gravity || 0.11;
+    this.thrust = p.thrust || 1;
+    this.level_data = {};
+
+    this.ctx = p.ctx || null;
+
+    if(this.ctx == null){
+      console.log(": WARNING: Game::World::ctx: "+this.ctx);
+    }
+
+    this.draw = function(){
+      
+    }
   },
 
   Player: function(p){
@@ -76,11 +88,11 @@ var Game = {
     this.rot = 0;
 
     this.thruster_emitters = [];
-    this.thruster_emitters[0] = new ParticleHandler({
+    this.thruster_emitters[0] = new ParticleHandlerFountain({
       dist: 30,
       x: this.x-8,
       y: this.y+10,
-      direction: this.rot+90,
+      direction: this.rot+60,
       speed: 1,
       friction: 0.95,
       ctx: Game.buffer.ctx,
@@ -90,11 +102,11 @@ var Game = {
       count: 30
     });
 
-    this.thruster_emitters[1] = new ParticleHandler({
+    this.thruster_emitters[1] = new ParticleHandlerFountain({
       dist: 30,
       x: this.x+8,
       y: this.y+10,
-      direction: this.rot+90,
+      direction: this.rot+120,
       speed: 1,
       friction: 0.95,
       ctx: Game.buffer.ctx,
@@ -105,35 +117,59 @@ var Game = {
     });
 
     this.update = function(){
-      this.x += (this.ax *= 0.87);
-      this.rot = (this.rot += (this.ax*1.5)) * 0.87;
-      this.y += this.ay *= 0.87;
+      this.x += (this.ax *= Game.world.friction);
+      this.rot = (this.rot += (this.ax*1.5)) * Game.world.friction;
+
+      this.ay += Game.world.gravity;
+      this.y += this.ay;
+
+
+    }
+
+    this.collision = function(object){
+      this.r1 = this.r1 || {
+        x: (this.x-this.width/2),
+        y: (this.y-this.height/2),
+        w: (this.x+this.width/2),
+        h: (this.y+this.height/2)
+      };
+
+      r2 = {
+        x: (object.x-object.width/2),
+        y: (object.y-object.height/2),
+        w: (object.x+object.width/2),
+        h: (object.y+object.height/2)
+      }
+
+      // check the collision between the two objects
+      return false
+
     }
 
     this.draw = function(){
+
+      // this.thruster_emitters[0].update({
+      //   x: this.x,
+      //   y: this.y,
+      //   direction: this.rot+60,
+      //   speed: 1
+      // });
+      // this.thruster_emitters[0].draw();
+
+      // this.thruster_emitters[1].update({
+      //   x: this.x,
+      //   y: this.y,
+      //   direction: this.rot+120,
+      //   speed: 1
+      // });
+      // this.thruster_emitters[1].draw();
+
       Game.buffer.ctx.save();
       Game.buffer.ctx.translate(this.x, this.y);
       Game.buffer.ctx.rotate((this.rot) * Math.PI/180);
 
       Game.buffer.ctx.drawImage(this.image, 0-(this.image.width/2), 0-(this.image.height/2), this.image.width, this.image.height);
       Game.buffer.ctx.restore();
-
-      this.thruster_emitters[0].update({
-        x: this.x+8,
-        y: this.y+10,
-        direction: this.rot+90,
-        speed: 1
-      });
-      this.thruster_emitters[0].draw();
-
-      this.thruster_emitters[1].update({
-        x: this.x-8,
-        y: this.y+10,
-        direction: this.rot+90,
-        speed: 1
-      });
-      this.thruster_emitters[1].draw();
-
 
       return true;
     }
@@ -184,6 +220,19 @@ var Game = {
     Game.resources = new Game.ResourceHandler();
     Game.resources.load("ship", "image", "images/dev/ship.png");
 
+    Game.world = new Game.World({
+      gravity: 0.07,
+      thrust: 0.89
+    });
+
+    Game.snow = new ParticleHandlerSpots({
+      ctx: Game.buffer.ctx,
+      direction: 110,
+      speed: 4,
+      r: 100,
+      b: 100
+    });
+
     // this will be dynamic depending on the level
     Game.player = new Game.Player({
       x: 300,
@@ -199,31 +248,32 @@ var Game = {
   loop: function(){
 
     if(Game.key.keyIs('w')){
-      Game.player.ay -= 1;
+      Game.player.ay -= 0.18*Game.world.thrust;
       
     }
     if(Game.key.keyIs('s')){
-      Game.player.ay += 1;
+      Game.player.ay += 0.18*Game.world.thrust;
       
     }
     if(Game.key.keyIs('a')){
-      Game.player.ax -= 1;
+      Game.player.ax -= 0.18;
       
     }
     if(Game.key.keyIs('d')){
-      Game.player.ax += 1;
+      Game.player.ax += 0.18;
       
     }
 
     // Batch the update calls
     Game.player.update();
-
+    Game.snow.update({});
 
     // Batch the drawing calls
 
+    Game.snow.draw();
     Game.player.draw();
-    Game.screen.ctx.drawImage(Game.buffer.cvs, 0, 0);
 
+    Game.screen.ctx.drawImage(Game.buffer.cvs, 0, 0);
     Game.buffer.ctx.fillStyle = "rgb(0,0,0)";
     Game.buffer.ctx.fillRect(0, 0, 640, 480);
 
