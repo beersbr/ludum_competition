@@ -57,23 +57,50 @@ var Game = {
   // OBJECTS
   // ---------------------------------------------------------------------------------------------------
 
+
+
+  // ----------------------------------------
+  // WORLD
+  // ----------------------------------------
   World: function(p){
     this.friction = p.friction || 0.92;
     this.gravity = p.gravity || 0.11;
     this.thrust = p.thrust || 1;
-    this.level_data = {};
+    this.level_data = {
+      "walls":[
+        {"x": 0, "y": 470, "w": 640,"h": 10, "type": "solid"},
+        {"x": 0, "y": 0,   "w": 10,"h": 480, "type": "solid"}
+      ]
+    };
+
+    this.walls = this.level_data.walls;
 
     this.ctx = p.ctx || null;
 
     if(this.ctx == null){
-      console.log(": WARNING: Game::World::ctx: "+this.ctx);
+      console.log("WARNING: Game::World::ctx: "+this.ctx);
     }
 
     this.draw = function(){
-      
+      for(var i in this.level_data.walls){
+        var o = this.level_data.walls[i];
+
+        switch(o.type){
+          case "solid":
+            this.ctx.save();
+            this.ctx.fillStyle = "rgb(255, 0, 150)";
+            this.ctx.fillRect(o.x, o.y, o.w, o.h);
+            this.ctx.restore();
+            break;
+        }
+      }
     }
   },
 
+
+  // ----------------------------------------
+  // PLAYER
+  // ----------------------------------------
   Player: function(p){
     // member variables
     this.x = p.x;
@@ -117,33 +144,62 @@ var Game = {
     });
 
     this.update = function(){
+      for(var i in Game.world.walls){
+        var o = Game.world.walls[i];
+
+        if(this.collision(o)){
+          switch(o.type){
+            case "solid":
+              console.log("colliding");
+              break;
+          }
+        }
+      }
+
       this.x += (this.ax *= Game.world.friction);
       this.rot = (this.rot += (this.ax*1.5)) * Game.world.friction;
-
       this.ay += Game.world.gravity;
       this.y += this.ay;
-
-
     }
 
     this.collision = function(object){
-      this.r1 = this.r1 || {
+      this.r1 = {
         x: (this.x-this.width/2),
         y: (this.y-this.height/2),
         w: (this.x+this.width/2),
-        h: (this.y+this.height/2)
+        h: (this.y+this.height/2),
+        right: (this.x+this.width/2),
+        left: (this.x-this.width/2),
+        top: (this.y-this.height/2),
+        bottom: (this.y+this.height/2)
       };
 
-      r2 = {
-        x: (object.x-object.width/2),
-        y: (object.y-object.height/2),
-        w: (object.x+object.width/2),
-        h: (object.y+object.height/2)
-      }
+      var r2 = {
+        x: (object.x),
+        y: (object.y),
+        w: (object.w),
+        h: (object.h),
+        right: object.x+object.w,
+        left: object.x,
+        top: object.y,
+        bottom: object.y+object.h
+      };
 
-      // check the collision between the two objects
-      return false
+      // collision
 
+      if(this.r1.left > r2.right)
+        return false;
+
+      if(this.r1.right < r2.left)
+        return false;
+
+      if(this.r1.top > r2.bottom)
+        return false;
+
+      if(this.r1.bottom < r2.top)
+        return false;
+
+      return true;
     }
 
     this.draw = function(){
@@ -176,6 +232,10 @@ var Game = {
 
   },
 
+
+  // ----------------------------------------
+  // RESOURCE HANDLER
+  // ----------------------------------------
   ResourceHandler: function(){
     this.res = {};
     this.size = 0;
@@ -201,6 +261,10 @@ var Game = {
   // FUNCTIONS
   // ---------------------------------------------------------------------------------------------------
 
+
+  // ----------------------------------------
+  // INIT
+  // ----------------------------------------
   init: function(p){
     // Create the buffer and the back buffer
     Game.screen.cvs = document.getElementById(p.canvas);
@@ -222,7 +286,8 @@ var Game = {
 
     Game.world = new Game.World({
       gravity: 0.07,
-      thrust: 0.89
+      thrust: 0.89,
+      ctx: Game.buffer.ctx
     });
 
     Game.snow = new ParticleHandlerSpots({
@@ -245,6 +310,9 @@ var Game = {
     return true;
   },
 
+  // ----------------------------------------
+  // LOOP
+  // ----------------------------------------
   loop: function(){
 
     if(Game.key.keyIs('w')){
@@ -271,6 +339,7 @@ var Game = {
     // Batch the drawing calls
 
     Game.snow.draw();
+    Game.world.draw();
     Game.player.draw();
 
     Game.screen.ctx.drawImage(Game.buffer.cvs, 0, 0);
