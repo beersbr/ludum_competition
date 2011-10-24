@@ -69,7 +69,8 @@ var Game = {
     this.level_data = {
       "walls":[
         {"x": 0, "y": 470, "w": 640,"h": 10, "type": "solid"},
-        {"x": 0, "y": 0,   "w": 10,"h": 480, "type": "solid"}
+        {"x": 0, "y": 0,   "w": 10,"h": 480, "type": "solid"},
+        {"x": 340, "y": 200,   "w": 300,"h": 10, "type": "solid"}
       ]
     };
 
@@ -144,13 +145,23 @@ var Game = {
     });
 
     this.update = function(){
+      this.ay += Game.world.gravity;
+
       for(var i in Game.world.walls){
         var o = Game.world.walls[i];
 
-        if(this.collision(o)){
+        if(this.collision(o) > 0){
           switch(o.type){
             case "solid":
-              console.log("colliding");
+
+              break;
+
+            case "zone":
+              
+              break;
+
+            default:
+
               break;
           }
         }
@@ -158,8 +169,10 @@ var Game = {
 
       this.x += (this.ax *= Game.world.friction);
       this.rot = (this.rot += (this.ax*1.5)) * Game.world.friction;
-      this.ay += Game.world.gravity;
+
+      
       this.y += this.ay;
+
     }
 
     this.collision = function(object){
@@ -186,40 +199,39 @@ var Game = {
       };
 
       // collision
-
-
       var ret = 0;
-      if(rect1.right + this.ax > rect2.left && rect1.right+this.ax < rect2.right){
-        if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top) || (this.y < rect2.bottom && this.y > rect2.top)){
-          this.ax = 0;
-          this.x = rect2.left-this.width/2;
-          ret = 1;
-        }
-      }else if(rect1.left+this.ax < rect2.right && rect1.left+this.ax > rect2.left){
-        if((rect1.top > rect2.top && rect1.top < rect2.bottom) || (rect1.bottom < rect2.bottom && rect1.bottom > rect2.top) || (this.y < rect2.bottom && this.y > rect2.top)){
-          this.ax = 0;
-          this.x = rect2.right+this.width/2;
-          ret = 1;
-        }
-      }
 
       // check the y 
-      // TODO: Need to figure out the height being bigger than the object
-      if((rect1.top + this.ay) < rect2.bottom && (rect1.top + this.ay) > rect2.top){
-        if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
+      if((this.r1.top + this.ay) < r2.bottom && (this.r1.top + this.ay) > r2.top){
+        if((this.r1.left < r2.right && this.r1.left > r2.left) || (this.r1.right > r2.left && this.r1.right < r2.right) || (this.x < r2.right && this.x > r2.left)){
           this.ay = 0;
-          this.y = rect2.bottom+(this.height/2);
+          this.y = r2.bottom+(this.height/2);
+
+          ret = 2;
+          if(ret == 1) ret = 3;
+        }
+      }else if(((this.r1.bottom+this.ay) > r2.top) && ((this.r1.bottom+this.ay) < r2.bottom)){
+        if((this.r1.left < r2.right && this.r1.left > r2.left) || (this.r1.right > r2.left && this.r1.right < r2.right) || (this.x < r2.right && this.x > r2.left)){
+          this.ay = 0;
+          this.y = r2.top-(this.height/2);
+
           ret = 2;
           if(ret == 1) ret = 3;
         }
       }
-      else if(rect1.bottom+this.ay > rect2.top && rect1.bottom+this.ay < rect2.bottom){
-        if((rect1.left < rect2.right && rect1.left > rect2.left) || (rect1.right > rect2.left && rect1.right < rect2.right) || (this.x < rect2.right && this.x > rect2.left)){
-          this.ay = 0;
-          this.y = rect2.top-this.height/2;
 
-          ret = 2;
-          if(ret == 1) ret = 3;
+      // check the x
+      if(this.r1.right + this.ax > r2.left && this.r1.right+this.ax < r2.right){
+        if((this.r1.top > r2.top && this.r1.top < r2.bottom) || (this.r1.bottom < r2.bottom && this.r1.bottom > r2.top) || (this.y < r2.bottom && this.y > r2.top)){
+          this.ax = 0;
+          this.x = r2.left-this.width/2;
+          ret = 1;
+        }
+      }else if(this.r1.left+this.ax < r2.right && this.r1.left+this.ax > r2.left){
+        if((this.r1.top > r2.top && this.r1.top < r2.bottom) || (this.r1.bottom < r2.bottom && this.r1.bottom > r2.top) || (this.y < r2.bottom && this.y > r2.top)){
+          this.ax = 0;
+          this.x = r2.right+this.width/2;
+          ret = 1;
         }
       }
 
@@ -339,8 +351,8 @@ var Game = {
     Game.player = new Game.Player({
       x: 300,
       y: 300,
-      w: 100,
-      h: 100,
+      w: 25,
+      h: 25,
       image_obj: Game.resources.ship
     });
 
